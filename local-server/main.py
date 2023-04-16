@@ -1,4 +1,5 @@
 from dotenv import load_dotenv
+import subprocess
 
 load_dotenv()
 
@@ -63,6 +64,13 @@ async def get_openapi(request):
 @app.post("/index-repo")
 async def new_route(data: dict) -> dict:
     # Implement the logic for the new route here
+
+    # run the script again a file that's located somewhere temp
+    #numer of the file
+    repo_name = data['repo_name']
+    subprocess.run(['python3', '../scripts/process_zip/process_zip.py'
+                    f"--filepath ../tmp/{repo_name}`.zip"])
+
     response = {
         "message": "New route successfully called",
         "data": data
