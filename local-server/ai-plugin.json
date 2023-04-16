@@ -5,14 +5,19 @@
   "description_for_model": "Plugin for searching through the user's documents (such as files, emails, and more) to find answers to questions and retrieve relevant information. Use it whenever a user asks something that might be found in their personal information.",
   "description_for_human": "Search through your documents.",
   "auth": {
-    "type": "none"
-  },
+    "type": "oauth",
+    "client_url": "https://github.com/login/oauth/authorize",
+    "scope": "",
+    "authorization_url": "https://my_server.com/token",
+    "authorization_content_type": "application/json",
+    "verification_tokens": {
+      "openai": "abc123456"
+    },
   "api": {
     "type": "openapi",
     "url": "http://localhost:3333/.well-known/openapi.yaml"
   },
   "logo_url": "http://localhost:3333/.well-known/logo.png",
-  "contact_email": "hello@contact.com", 
+  "contact_email": "hello@contact.com",
   "legal_info_url": "hello@legal.com"
 }
-
