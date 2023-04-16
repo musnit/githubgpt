@@ -1,5 +1,4 @@
 from dotenv import load_dotenv
-import subprocess
 # from process_zip import process_file_dump
 from urllib.parse import urlparse, unquote
 
@@ -30,7 +29,6 @@ from starlette.responses import FileResponse
 
 from models.models import DocumentMetadata, Source
 from fastapi.middleware.cors import CORSMiddleware
-
 
 app = FastAPI()
 
@@ -255,8 +253,6 @@ async def delete(
         print("Error:", e)
         raise HTTPException(status_code=500, detail="Internal Service Error")
 
-
-PINECONE_INDEX = os.environ.get("PINECONE_INDEX")
 
 @app.on_event("startup")
 async def startup():
