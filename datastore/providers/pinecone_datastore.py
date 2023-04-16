@@ -32,27 +32,28 @@ UPSERT_BATCH_SIZE = 100
 
 
 # create index
-# # Get all fields in the metadata object in a list
-# fields_to_index = list(DocumentChunkMetadata.__fields__.keys())
-
-# # Create a new index with the specified name, dimension, and metadata configuration
-# try:
-#     print(
-#         f"Creating index {self.index_name} with metadata config {fields_to_index}"
-#     )
-#     pinecone.create_index(
-#         self.index_name,
-#         dimension=1536,  # dimensionality of OpenAI ada v2 embeddings
-#         metadata_config={"indexed": fields_to_index},
-#     )
-#     self.index = pinecone.Index(self.index_name)
-#     print(f"Index {self.index_name} created successfully")
-# except Exception as e:
-#     print(f"Error creating index {self.index_name}: {e}")
-#     raise e
-
 class PineconeDataStore(DataStore):
-    def __init__(self, index_name):
+    def __init__(self, index_name, create_index=False):
+
+        if create_index:
+            # # Get all fields in the metadata object in a list
+            fields_to_index = list(DocumentChunkMetadata.__fields__.keys())
+
+            # Create a new index with the specified name, dimension, and metadata configuration
+            try:
+                print(
+                    f"Creating index {index_name} with metadata config {fields_to_index}"
+                )
+                pinecone.create_index(
+                    index_name,
+                    dimension=1536,  # dimensionality of OpenAI ada v2 embeddings
+                    metadata_config={"indexed": fields_to_index},
+                )
+                self.index = pinecone.Index(index_name)
+                print(f"Index {index_name} created successfully")
+            except Exception as e:
+                print(f"Error creating index {index_name}: {e}")
+                raise e
 
         self.index_name = index_name
 

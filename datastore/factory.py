@@ -2,7 +2,7 @@ from datastore.datastore import DataStore
 import os
 
 
-async def get_datastore(index_name) -> DataStore:
+async def get_datastore(index_name, create_index=False) -> DataStore:
     datastore = os.environ.get("DATASTORE")
     assert datastore is not None
 
@@ -14,7 +14,7 @@ async def get_datastore(index_name) -> DataStore:
         case "pinecone":
             from datastore.providers.pinecone_datastore import PineconeDataStore
 
-            return PineconeDataStore(index_name)
+            return PineconeDataStore(index_name, create_index)
         case "weaviate":
             from datastore.providers.weaviate_datastore import WeaviateDataStore
 
