@@ -138,7 +138,7 @@ class PineconeDataStore(DataStore):
                 print(f"Error querying index: {e}")
                 raise e
 
-            query_results: List[DocumentChunkWithScore] = []
+            query_results: List[DocumentChunk] = []
             for result in query_response.matches:
                 score = result.score
                 metadata = result.metadata
@@ -158,11 +158,9 @@ class PineconeDataStore(DataStore):
                     metadata_without_text["source"] = None
 
                 # Create a document chunk with score object with the result data
-                result = DocumentChunkWithScore(
+                result = DocumentChunk(
                     id=result.id,
-                    score=score,
                     text=metadata["text"] if metadata and "text" in metadata else None,
-                    metadata=metadata_without_text,
                 )
                 query_results.append(result)
             return QueryResult(query=query.query, results=query_results)

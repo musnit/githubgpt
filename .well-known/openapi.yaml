@@ -77,6 +77,23 @@ components:
         score:
           title: Score
           type: number
+    DocumentChunk:
+      title: DocumentChunk
+      required:
+        - text
+      type: object
+      properties:
+        id:
+          title: Id
+          type: string
+        text:
+          title: Text
+          type: string
+        embedding:
+          title: Embedding
+          type: array
+          items:
+            type: number
     DocumentMetadataFilter:
       title: DocumentMetadataFilter
       type: object

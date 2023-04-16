@@ -24,7 +24,6 @@ class DocumentChunkMetadata(DocumentMetadata):
 class DocumentChunk(BaseModel):
     id: Optional[str] = None
     text: str
-    metadata: DocumentChunkMetadata
     embedding: Optional[List[float]] = None
 
 
@@ -63,4 +62,4 @@ class QueryWithEmbedding(Query):
 
 class QueryResult(BaseModel):
     query: str
-    results: List[DocumentChunkWithScore]
+    results: List[DocumentChunk]
