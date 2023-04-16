@@ -31,32 +31,33 @@ pinecone.init(api_key=PINECONE_API_KEY, environment=PINECONE_ENVIRONMENT)
 UPSERT_BATCH_SIZE = 100
 
 
+# create index
+# # Get all fields in the metadata object in a list
+# fields_to_index = list(DocumentChunkMetadata.__fields__.keys())
+
+# # Create a new index with the specified name, dimension, and metadata configuration
+# try:
+#     print(
+#         f"Creating index {self.index_name} with metadata config {fields_to_index}"
+#     )
+#     pinecone.create_index(
+#         self.index_name,
+#         dimension=1536,  # dimensionality of OpenAI ada v2 embeddings
+#         metadata_config={"indexed": fields_to_index},
+#     )
+#     self.index = pinecone.Index(self.index_name)
+#     print(f"Index {self.index_name} created successfully")
+# except Exception as e:
+#     print(f"Error creating index {self.index_name}: {e}")
+#     raise e
+
 class PineconeDataStore(DataStore):
     def __init__(self, index_name):
 
         self.index_name = index_name
 
-        # Check if the index name is specified and exists in Pinecone
         if self.index_name and self.index_name not in pinecone.list_indexes():
-
-            # Get all fields in the metadata object in a list
-            fields_to_index = list(DocumentChunkMetadata.__fields__.keys())
-
-            # Create a new index with the specified name, dimension, and metadata configuration
-            try:
-                print(
-                    f"Creating index {self.index_name} with metadata config {fields_to_index}"
-                )
-                pinecone.create_index(
-                    self.index_name,
-                    dimension=1536,  # dimensionality of OpenAI ada v2 embeddings
-                    metadata_config={"indexed": fields_to_index},
-                )
-                self.index = pinecone.Index(self.index_name)
-                print(f"Index {self.index_name} created successfully")
-            except Exception as e:
-                print(f"Error creating index {self.index_name}: {e}")
-                raise e
+            raise HTTPException(status_code=404, detail="Repo is not indexed. You can index it by posting to the /index-repo endpoint.")
         elif self.index_name and self.index_name in pinecone.list_indexes():
             # Connect to an existing index with the specified name
             try:
@@ -117,34 +118,6 @@ class PineconeDataStore(DataStore):
         """
         Takes in a list of queries with embeddings and filters and returns a list of query results with matching document chunks and scores.
         """
-
-        def convert_url_to_name(url):
-            print("doing convert..")
-
-            print(f"repo_url is {url}")
-
-            # Parse the URL
-            parsed_url = urlparse(url)
-
-            # Extract the path component of the URL
-            path = parsed_url.path
-
-            # Split the path into components
-            path_components = path.strip('/').split('/')
-
-            # Join the components with a hyphen to form the desired string
-            result = '-'.join(path_components)
-
-            return result
-
-        print("Query started")
-        index_name = convert_url_to_name(repo_url)
-        print(f"Index name is {index_name}")
-
-        if index_name and index_name not in pinecone.list_indexes():
-            raise HTTPException(status_code=404, detail="Repo is not indexed. You can index it by posting to the /index-repo endpoint.")
-
-        index = pinecone.Index(self.index_name)
 
         # Define a helper coroutine that performs a single query and returns a QueryResult
         async def _single_query(query: QueryWithEmbedding) -> QueryResult:

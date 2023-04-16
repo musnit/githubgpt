@@ -122,7 +122,6 @@ async def index_repo(
     download_zip_file(repo_name, zip_url)
     # subprocess.run(['python3', '../scripts/process_zip/process_zip.py'
     # f"--filepath ../tmp/{repo_name}`.zip"])
-
     success = True
     return IndexResponse(success=success)
 
@@ -167,11 +166,14 @@ async def upsert(
         print("Error:", e)
         raise HTTPException(status_code=500, detail="Internal Service Error")
 
-
 @app.post("/query", response_model=QueryResponse)
 async def query_main(request: QueryRequest = Body(...)):
     try:
         print("Query - checking datastore")
+        index_name = convert_url_to_name(request.repo_url)
+        global datastore
+        datastore = await get_datastore(index_name)
+
         results = await datastore.query(
             request.queries,
             request.repo_url
@@ -214,9 +216,7 @@ PINECONE_INDEX = os.environ.get("PINECONE_INDEX")
 
 @app.on_event("startup")
 async def startup():
-    global datastore
-    datastore = await get_datastore(PINECONE_INDEX)
-
+    return
 
 def start():
     uvicorn.run("local-server.main:app", host="localhost", port=PORT, reload=True)
