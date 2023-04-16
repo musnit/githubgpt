@@ -33,3 +33,9 @@ class DeleteRequest(BaseModel):
 
 class DeleteResponse(BaseModel):
     success: bool
+
+class IndexRequest(BaseModel):
+    repo_url: str
+
+class IndexResponse(BaseModel):
+    success: bool

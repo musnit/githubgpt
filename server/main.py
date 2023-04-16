@@ -13,6 +13,7 @@ from models.api import (
     DeleteRequest,
     DeleteResponse,
     QueryRequest,
+    IndexResponse,
     QueryResponse,
     UpsertRequest,
     UpsertResponse,

@@ -1,5 +1,6 @@
 from dotenv import load_dotenv
 import subprocess
+from urllib.parse import urlparse
 
 load_dotenv()
 
@@ -14,6 +15,8 @@ from fastapi import FastAPI, File, Form, HTTPException, Body, UploadFile
 from models.api import (
     DeleteRequest,
     DeleteResponse,
+    IndexRequest,
+    IndexResponse,
     QueryRequest,
     QueryResponse,
     UpsertRequest,
@@ -45,6 +48,24 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+def convert_url_to_name(url):
+    print("doing convert..")
+
+    print(f"repo_url is {url}")
+
+    # Parse the URL
+    parsed_url = urlparse(url)
+
+    # Extract the path component of the URL
+    path = parsed_url.path
+
+    # Split the path into components
+    path_components = path.strip('/').split('/')
+
+    # Join the components with a hyphen to form the desired string
+    result = '-'.join(path_components)
+
+    return result
 
 @app.route("/.well-known/ai-plugin.json")
 async def get_manifest(request):
@@ -61,21 +82,21 @@ async def get_openapi(request):
     file_path = "./local-server/openapi.yaml"
     return FileResponse(file_path, media_type="text/json")
 
-@app.post("/index-repo")
-async def new_route(data: dict) -> dict:
-    # Implement the logic for the new route here
+@app.post(
+    "/index-repo",
+    response_model=IndexResponse,
+)
+async def index_repo(
+    request: IndexRequest = Body(...),
+):
+    repo_name = convert_url_to_name(request.repo_url)
+    print(f"Indexing {repo_name}")
 
-    # run the script again a file that's located somewhere temp
-    #numer of the file
-    repo_name = data['repo_name']
-    subprocess.run(['python3', '../scripts/process_zip/process_zip.py'
-                    f"--filepath ../tmp/{repo_name}`.zip"])
+    # subprocess.run(['python3', '../scripts/process_zip/process_zip.py'
+    # f"--filepath ../tmp/{repo_name}`.zip"])
 
-    response = {
-        "message": "New route successfully called",
-        "data": data
-    }
-    return response
+    success = True
+    return IndexResponse(success=success)
 
 @app.post(
     "/upsert-file",
