@@ -1,7 +1,7 @@
 openapi: 3.0.2
 info:
-  title: Retrieval Plugin API
-  description: A retrieval API for querying and filtering documents based on natural language queries and metadata
+  title: Code Context API
+  description: A code context API for querying for context within a code repo based on natural language queries
   version: 1.0.0
   servers:
     - url: http://localhost:3333
@@ -9,7 +9,7 @@ paths:
   /query:
     post:
       summary: Query
-      description: Accepts search query objects array each with query and optional filter. Break down complex questions into sub-questions. Refine results by criteria, e.g. time / source, don't do this often. Split queries if ResponseTooLargeError occurs.
+      description: Accepts search query objects array each with query. Break down complex questions into sub-questions for different types, functions or concepts. Split queries if ResponseTooLargeError occurs.
       operationId: query_query_post
       requestBody:
         content:
@@ -30,6 +30,21 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HTTPValidationError"
+  /index-repo:
+    post:
+      summary: Index Repo
+      description: Index a new git repository from a given URL.
+      operationId: index_repo
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IndexRequest"
+        required: true
+      responses:
+        "200":
+          description: Successful Response
+          content: {}
 components:
   schemas:
     DocumentChunkMetadata:
@@ -121,7 +136,7 @@ components:
         top_k:
           title: Top K
           type: integer
-          default: 3
+          default: 9
     QueryRequest:
       title: QueryRequest
       required:
@@ -144,21 +159,17 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/QueryResult"
+    IndexRequest:
+      title: IndexRequest
+      type: object
+      required:
+        - url
+      properties:
+        url:
+          title: URL
+          type: string
     QueryResult:
       title: QueryResult
-      required:
-        - query
-        - results
-      type: object
-      properties:
-        query:
-          title: Query
-          type: string
-        results:
-          title: Results
-          type: array
-          items:
-            $ref: "#/components/schemas/DocumentChunkWithScore"
     Source:
       title: Source
       enum:

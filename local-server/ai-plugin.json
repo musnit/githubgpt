@@ -1,18 +1,18 @@
 {
   "schema_version": "v1",
-  "name_for_model": "retrieval",
-  "name_for_human": "Retrieval Plugin",
-  "description_for_model": "Plugin for searching through the user's documents (such as files, emails, and more) to find answers to questions and retrieve relevant information. Use it whenever a user asks something that might be found in their personal information.",
+  "name_for_model": "code_context",
+  "name_for_human": "Code Context",
+  "description_for_model": "Plugin for searching through a named git repo filled with code. Use it whenever a user asks something that might be found in the repo, or asks you to write code for them so that you can query for additional context in the existing code. You can query the plugin to find out things like the types, libraries and functions that are available in the repo so that you have much more context about the repo to help you answer their questions or write code for them that is compatible with existing code in the repo.",
   "description_for_human": "Search through your documents.",
   "auth": {
     "type": "none"
   },
   "api": {
     "type": "openapi",
-    "url": "https://your-app-url.com/.well-known/openapi.yaml",
+    "url": "http://localhost:3333/.well-known/openapi.yaml",
     "has_user_authentication": false
   },
-  "logo_url": "https://your-app-url.com/.well-known/logo.png",
+  "logo_url": "http://localhost:3333/.well-known/logo.png",
   "contact_email": "hello@contact.com",
   "legal_info_url": "http://example.com/legal-info"
 }

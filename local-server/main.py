@@ -60,6 +60,14 @@ async def get_openapi(request):
     file_path = "./local-server/openapi.yaml"
     return FileResponse(file_path, media_type="text/json")
 
+@app.post("/index-repo")
+async def new_route(data: dict) -> dict:
+    # Implement the logic for the new route here
+    response = {
+        "message": "New route successfully called",
+        "data": data
+    }
+    return response
 
 @app.post(
     "/upsert-file",
