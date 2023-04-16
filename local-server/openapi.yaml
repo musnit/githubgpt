@@ -9,7 +9,7 @@ paths:
   /query:
     post:
       summary: Query
-      description: Accepts search query objects array each with query. Break down complex questions into sub-questions for different types, functions or concepts. Send concise queries with keywords only. Split queries if ResponseTooLargeError occurs.
+      description: Accepts search query objects array each with query. Break down complex questions into sub-questions for different types, functions or concepts. Split queries if ResponseTooLargeError occurs.
       operationId: query_query_post
       requestBody:
         content:
@@ -47,6 +47,23 @@ paths:
           content: {}
 components:
   schemas:
+    DocumentChunk:
+      title: DocumentChunk
+      required:
+        - text
+      type: object
+      properties:
+        id:
+          title: Id
+          type: string
+        text:
+          title: Text
+          type: string
+        embedding:
+          title: Embedding
+          type: array
+          items:
+            type: number
     DocumentChunkMetadata:
       title: DocumentChunkMetadata
       type: object
