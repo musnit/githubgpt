@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 import subprocess
 from urllib.parse import urlparse
+from process_zip import process_file_dump
 
 load_dotenv()
 
@@ -92,8 +93,7 @@ async def index_repo(
     repo_name = convert_url_to_name(request.repo_url)
     print(f"Indexing {repo_name}")
 
-    # subprocess.run(['python3', '../scripts/process_zip/process_zip.py'
-    # f"--filepath ../tmp/{repo_name}`.zip"])
+    process_file_dump(filepath=f"../tmp/{repo_name}.zip")
 
     success = True
     return IndexResponse(success=success)
