@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 import subprocess
 from urllib.parse import urlparse
 from process_zip import process_file_dump
+from urllib.parse import urlparse, unquote
 
 load_dotenv()
 
@@ -83,6 +84,28 @@ async def get_openapi(request):
     file_path = "./local-server/openapi.yaml"
     return FileResponse(file_path, media_type="text/json")
 
+def convert_to_zip_url(repo_url):
+    # Append the path to the ZIP archive of the main branch to the original URL
+    zip_url = repo_url.rstrip('/') + '/archive/refs/heads/main.zip'
+    return zip_url
+
+import requests
+def download_zip_file(filename, url, output_dir='.'):
+    output_path = f"{output_dir}/{filename}.zip"
+    print(f"Downloading zip to: {output_path}")
+
+    # Send a GET request to the URL to download the file
+    response = requests.get(url)
+
+    # Check if the request was successful (status code 200)
+    if response.status_code == 200:
+        # Write the content of the response to a local file
+        with open(output_path, 'wb') as file:
+            file.write(response.content)
+        print(f"File downloaded successfully to {output_path}")
+    else:
+        print(f"Failed to download file. Status code: {response.status_code}")
+
 @app.post(
     "/index-repo",
     response_model=IndexResponse,
@@ -94,6 +117,11 @@ async def index_repo(
     print(f"Indexing {repo_name}")
 
     process_file_dump(filepath=f"../tmp/{repo_name}.zip")
+    zip_url = convert_to_zip_url(request.repo_url)
+    print(f"Downloading {zip_url}")
+    download_zip_file(repo_name, zip_url)
+    # subprocess.run(['python3', '../scripts/process_zip/process_zip.py'
+    # f"--filepath ../tmp/{repo_name}`.zip"])
 
     success = True
     return IndexResponse(success=success)
