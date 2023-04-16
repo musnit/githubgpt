@@ -1,7 +1,6 @@
 from dotenv import load_dotenv
 import subprocess
-from urllib.parse import urlparse
-from process_zip import process_file_dump
+# from process_zip import process_file_dump
 from urllib.parse import urlparse, unquote
 
 load_dotenv()
@@ -85,11 +84,56 @@ async def get_openapi(request):
     return FileResponse(file_path, media_type="text/json")
 
 def convert_to_zip_url(repo_url):
+
+    if repo_url.endswith('.git'):
+        repo_url = repo_url[:-4]
+
     # Append the path to the ZIP archive of the main branch to the original URL
-    zip_url = repo_url.rstrip('/') + '/archive/refs/heads/main.zip'
+    branch_name = get_default_branch_name(repo_url)
+    zip_url = repo_url.rstrip('/') + '/archive/refs/heads/' + branch_name + '.zip'
     return zip_url
 
 import requests
+
+def get_default_branch_name(repo_url):
+    print(f"repo_url: {repo_url}")
+
+    if repo_url.endswith('.git'):
+        repo_url = repo_url[:-4]
+
+    repo_parts = repo_url.rstrip('/').split('/')
+    print(f"repo_parts: {repo_parts}")
+
+    repo_owner = repo_parts[-2]
+    print(f"repo_owner: {repo_owner}")
+
+    repo_name = repo_parts[-1]
+    print(f"repo_name: {repo_name}")
+
+    # Construct the URL for the GitHub API endpoint
+    api_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}"
+
+    print(f"querying api url: {api_url}")
+
+    # Make a GET request to the GitHub API endpoint
+    response = requests.get(api_url)
+
+    # Check if the request was successful
+    if response.status_code == 200:
+        print(response)
+        print(response.json())
+        # Parse the JSON response
+        repo_info = response.json()
+
+        # Get the default branch name from the JSON response
+        default_branch_name = repo_info.get('default_branch')
+
+        return default_branch_name
+    else:
+        print(f"Failed to get repository information. Status code: {response.status_code}")
+        return None
+
+
 def download_zip_file(filename, url, output_dir='.'):
     output_path = f"{output_dir}/{filename}.zip"
     print(f"Downloading zip to: {output_path}")
@@ -116,12 +160,12 @@ async def index_repo(
     repo_name = convert_url_to_name(request.repo_url)
     print(f"Indexing {repo_name}")
 
-    process_file_dump(filepath=f"../tmp/{repo_name}.zip")
     zip_url = convert_to_zip_url(request.repo_url)
     print(f"Downloading {zip_url}")
     download_zip_file(repo_name, zip_url)
     # subprocess.run(['python3', '../scripts/process_zip/process_zip.py'
     # f"--filepath ../tmp/{repo_name}`.zip"])
+    # process_file_dump(filepath=f"../tmp/{repo_name}.zip")
     success = True
     return IndexResponse(success=success)
 
