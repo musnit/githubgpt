@@ -281,8 +281,11 @@ async def index_repo(
 
     # initialize the db instance once as a global variable
     datastore = await get_datastore(index_name, True)
+    custom_metadata = {}
+    screen_for_pii = False
+    extract_metadata = False
 
-    process_file_dump(filepath=zip_filename, datastore=datastore)
+    process_file_dump(filepath=zip_filename, datastore=datastore, custom_metadata=custom_metadata, screen_for_pii=screen_for_pii, extract_metadata=extract_metadata)
 
     os.remove(zip_filename)
 

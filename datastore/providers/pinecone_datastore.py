@@ -35,7 +35,7 @@ UPSERT_BATCH_SIZE = 100
 class PineconeDataStore(DataStore):
     def __init__(self, index_name, create_index=False):
 
-        if create_index:
+        if index_name and index_name not in pinecone.list_indexes() and create_index:
             # # Get all fields in the metadata object in a list
             fields_to_index = list(DocumentChunkMetadata.__fields__.keys())
 
@@ -55,18 +55,16 @@ class PineconeDataStore(DataStore):
                 print(f"Error creating index {index_name}: {e}")
                 raise e
 
-        self.index_name = index_name
-
-        if self.index_name and self.index_name not in pinecone.list_indexes():
+        if index_name and index_name not in pinecone.list_indexes():
             raise HTTPException(status_code=404, detail="Repo is not indexed. You can index it by posting to the /index-repo endpoint.")
-        elif self.index_name and self.index_name in pinecone.list_indexes():
+        elif index_name and index_name in pinecone.list_indexes():
             # Connect to an existing index with the specified name
             try:
-                print(f"Connecting to existing index {self.index_name}")
-                self.index = pinecone.Index(self.index_name)
-                print(f"Connected to index {self.index_name} successfully")
+                print(f"Connecting to existing index {index_name}")
+                self.index = pinecone.Index(index_name)
+                print(f"Connected to index {index_name} successfully")
             except Exception as e:
-                print(f"Error connecting to index {self.index_name}: {e}")
+                print(f"Error connecting to index {index_name}: {e}")
                 raise e
 
     @retry(wait=wait_random_exponential(min=1, max=20), stop=stop_after_attempt(3))
