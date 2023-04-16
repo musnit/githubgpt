@@ -18,6 +18,7 @@ class UpsertResponse(BaseModel):
 
 class QueryRequest(BaseModel):
     queries: List[Query]
+    repo_url: str
 
 
 class QueryResponse(BaseModel):

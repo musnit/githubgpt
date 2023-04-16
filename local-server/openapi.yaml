@@ -141,8 +141,11 @@ components:
       title: QueryRequest
       required:
         - queries
+        - repo_url
       type: object
       properties:
+        repo_url:
+          type: string
         queries:
           title: Queries
           type: array
@@ -163,10 +166,10 @@ components:
       title: IndexRequest
       type: object
       required:
-        - url
+        - repo_url
       properties:
-        url:
-          title: URL
+        repo_url:
+          title: Github URL
           type: string
     QueryResult:
       title: QueryResult

@@ -3,6 +3,8 @@ import subprocess
 
 load_dotenv()
 
+import os
+
 # This is a version of the main.py file found in ../../../server/main.py for testing the plugin locally.
 # Use the command `poetry run dev` to run this.
 from typing import Optional
@@ -49,12 +51,10 @@ async def get_manifest(request):
     file_path = "./local-server/ai-plugin.json"
     return FileResponse(file_path, media_type="text/json")
 
-
 @app.route("/.well-known/logo.png")
 async def get_logo(request):
     file_path = "./local-server/logo.png"
     return FileResponse(file_path, media_type="text/json")
-
 
 @app.route("/.well-known/openapi.yaml")
 async def get_openapi(request):
@@ -122,11 +122,17 @@ async def upsert(
 @app.post("/query", response_model=QueryResponse)
 async def query_main(request: QueryRequest = Body(...)):
     try:
+        print("Query - checking datastore")
         results = await datastore.query(
             request.queries,
+            request.repo_url
         )
         return QueryResponse(results=results)
     except Exception as e:
+        print("Error detail:", e.detail)
+        if "not indexed" in e.detail:
+            print("not indexed error")
+            raise e
         print("Error:", e)
         raise HTTPException(status_code=500, detail="Internal Service Error")
 
@@ -155,10 +161,12 @@ async def delete(
         raise HTTPException(status_code=500, detail="Internal Service Error")
 
 
+PINECONE_INDEX = os.environ.get("PINECONE_INDEX")
+
 @app.on_event("startup")
 async def startup():
     global datastore
-    datastore = await get_datastore()
+    datastore = await get_datastore(PINECONE_INDEX)
 
 
 def start():
